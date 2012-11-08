@@ -8,6 +8,6 @@ Maintainer:          nick@broxholme.com
 Build-Type:          Simple
 Cabal-Version:       >=1.2
 Library
-  Exposed-modules:   CsvDatabase, Csvstuff, CsvParser
+  Exposed-modules:   CsvDatabase, Csvstuff, CsvParser, CsvStats
   Build-Depends:     base >= 3 && < 5, filepath, containers, parsec
   ghc-options:       -Wall  
