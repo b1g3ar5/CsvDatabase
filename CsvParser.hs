@@ -16,7 +16,7 @@ data Value = S String | N (Maybe Double) deriving (Eq, Ord)
 -- Shows just the value or an empty string
 instance Show Value where
 	show (S s) = s
-	show (N (Just v)) = show v
+	show (N (Just v)) = if (v==fromInteger (round v)) then show (round v) else show v
 	show (N Nothing) = ""
 
 

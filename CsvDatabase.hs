@@ -44,13 +44,12 @@ tailColV (ColN ns) =  ColN $ tail ns
 
 -- Overide the standard show
 instance Show (Maybe Double) where
-	show (Just v) = show v
+	show (Just v) = if (v == fromInteger (round v)) then show (round v) else show v
 	show Nothing = ""
 	 
 mshow::Show a => Maybe a -> String
 mshow (Just v) = show v
 mshow Nothing = ""
-
      
 instance Monoid ColValue where
 	mappend l1 l2 = case (l1, l2) of
