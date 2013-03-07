@@ -50,7 +50,7 @@ instance Show (Maybe Double) where
 mshow::Show a => Maybe a -> String
 mshow (Just v) = show v
 mshow Nothing = ""
-     
+          
 instance Monoid ColValue where
 	mappend l1 l2 = case (l1, l2) of
 					(ColN ln1, ColN ln2) -> ColN (ln1 ++ ln2)

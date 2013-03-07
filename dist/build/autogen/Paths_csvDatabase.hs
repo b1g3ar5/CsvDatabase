@@ -15,10 +15,10 @@ version :: Version
 version = Version {versionBranch = [0,0], versionTags = []}
 bindir, libdir, datadir, libexecdir :: FilePath
 
-bindir     = "c:/Documents and Settings/workspace/bin\\bin"
-libdir     = "c:/Documents and Settings/workspace/bin\\csvDatabase-0.0\\ghc-7.4.2"
-datadir    = "c:/Documents and Settings/workspace/bin\\csvDatabase-0.0"
-libexecdir = "c:/Documents and Settings/workspace/bin\\csvDatabase-0.0"
+bindir     = "/home/nick/.cabal/bin"
+libdir     = "/home/nick/.cabal/lib/csvDatabase-0.0/ghc-7.4.2"
+datadir    = "/home/nick/.cabal/share/csvDatabase-0.0"
+libexecdir = "/home/nick/.cabal/libexec"
 
 getBinDir, getLibDir, getDataDir, getLibexecDir :: IO FilePath
 getBinDir = catchIO (getEnv "csvDatabase_bindir") (\_ -> return bindir)
@@ -29,4 +29,4 @@ getLibexecDir = catchIO (getEnv "csvDatabase_libexecdir") (\_ -> return libexecd
 getDataFileName :: FilePath -> IO FilePath
 getDataFileName name = do
   dir <- getDataDir
-  return (dir ++ "\\" ++ name)
+  return (dir ++ "/" ++ name)
