@@ -1,0 +1,13 @@
+Name:                CsvDatabase
+Version:             0.0
+Description:         Use a csv file as a simple database
+License:             GPL
+License-file:        LICENSE
+Author:              Nick Straw
+Maintainer:          nick@broxholme.com
+Build-Type:          Simple
+Cabal-Version:       >=1.2
+Library
+  Exposed-modules:   CsvDatabase, Csvstuff, CsvParser, CsvStats
+  Build-Depends:     base >= 3 && < 5, filepath, containers, parsec
+  ghc-options:       -Wall  
