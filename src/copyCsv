@@ -1,0 +1,1 @@
+﻿COPY score FROM '/home/nick/workspace/csvdatabase/src/scoreTable.csv' DELIMITER ',' CSV;
