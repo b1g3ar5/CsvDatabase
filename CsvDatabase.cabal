@@ -9,8 +9,7 @@ Build-Type:          Simple
 Cabal-Version:       >=1.2
 Library
   hs-source-dirs:      src
-  Exposed-modules:   CsvDatabase, Csvstuff, CsvParser, CsvStats
-  Build-Depends:     base, filepath, containers, parsec
-  ghc-options:       -Wall  
+  Exposed-modules:   CsvDatabase, Csvstuff, CsvParser, CsvStats, Types
+  Build-Depends:     base, filepath, containers, parsec, tostring
+  ghc-options:       -Wall
   default-language:    Haskell2010
-

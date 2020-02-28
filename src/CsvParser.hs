@@ -1,7 +1,15 @@
 
 module CsvParser
     (
-        Value, csvFile, line, pValue, pString, pNumber, pEmpty, parse, eshow
+          Value
+        , csvFile
+        , line
+        , pValue
+        , pString
+        , pNumber
+        , pEmpty
+        , parse
+        , vshow
     ) where
 
 import Control.Applicative
@@ -13,10 +21,10 @@ import Numeric (readSigned, readFloat)
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
 type Value a = Either String (Maybe a)
 
-eshow :: (Show a, Eq a, Num a, RealFrac a) => Value a -> String
-eshow (Left s) = s
-eshow (Right (Just v)) = if v==fromInteger (round v) then show (round v) else show v
-eshow (Right Nothing) = ""
+vshow :: (Show a, Eq a, Num a, RealFrac a) => Value a -> String
+vshow (Left s) = s
+vshow (Right (Just v)) = if v==fromInteger (round v) then show (round v) else show v
+vshow (Right Nothing) = ""
 
 csvFile :: Parser [[Value Double]]
 csvFile = endBy line eol

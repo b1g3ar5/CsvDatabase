@@ -7,24 +7,23 @@ module CsvStats
     ) where
 
 import Prelude hiding (id)
-import CsvDatabase
+import CsvDatabase (CParser(..), ColType, Tdb(..), mfoldl, dselect, isdouble, fromDb, fromTdb, exec, Selector(..))
 
-
-msum :: (Fractional a) => ColValue a -> a
+msum :: (Fractional a) => ColType a -> a
 msum = mfoldl (+) 0.0
-mmax :: (Ord a, Fractional a) => ColValue a -> a
+mmax :: (Ord a, Fractional a) => ColType a -> a
 mmax = mfoldl max 0.0
-mmin :: (Num a, Ord a, Fractional a) => ColValue a -> a
+mmin :: (Num a, Ord a, Fractional a) => ColType a -> a
 mmin = mfoldl min 1.0e100
-msumsq :: (Num a, Ord a, Fractional a) => ColValue a -> a
+msumsq :: (Num a, Ord a, Fractional a) => ColType a -> a
 msumsq = mfoldl (\a n -> a+n*n) 0.0
-mcount :: (Num a, Ord a, Fractional a) => ColValue a -> a
+mcount :: (Num a, Ord a, Fractional a) => ColType a -> a
 mcount = mfoldl (\a _ -> a+1.0) 0.0
-mmean :: (Num a, Ord a, Fractional a) => ColValue a -> a
+mmean :: (Num a, Ord a, Fractional a) => ColType a -> a
 mmean xs = msum xs / mcount xs
-mvar :: (Num a, Ord a, Fractional a, Floating a) => ColValue a -> a
+mvar :: (Num a, Ord a, Fractional a, Floating a) => ColType a -> a
 mvar xs = msumsq xs / mcount xs - mmean xs ** 2.0
-mstd :: (Num a, Ord a, Fractional a, Floating a) => ColValue a -> a
+mstd :: (Num a, Ord a, Fractional a, Floating a) => ColType a -> a
 mstd xs = sqrt $ mvar xs
 
 
@@ -42,11 +41,11 @@ data Box = Box {bopen::Double,
                 bcount::Int} deriving (Show)
 
 
-stat :: ColValue Double -> Stat
+stat :: ColType Double -> Stat
 stat mds =  Stat {smax=mmax mds, smin=mmin mds, smean=mmean mds, ssd=mstd mds, scount=floor $ mcount mds}
 
 
-box :: ColValue Double -> Box
+box :: ColType Double -> Box
 box mds =  Box {bopen=smean s + ssd s, bhi=smax s, blo=smin s, bclose=smean s - ssd s, bcount=scount s}
                 where
                     s = stat mds

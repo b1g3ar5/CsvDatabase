@@ -5,7 +5,6 @@ module CsvDatabase
     (
         dshow
         , Db
-        , ColValue
         , Col
         , select
         , dselect
@@ -21,23 +20,28 @@ module CsvDatabase
         , exec
         , cvShow
         , rshow
+        , ColType
+        , writeHeader
+        , eshow
     ) where
 
 import Data.List
+import Data.String.ToString
 import Prelude hiding (id)
 import CsvParser
+import Types hiding (Row, mshow)
 
 -- We have 2 types, string or numbers = Maybe Double
 -- So, strings are NOT NULL, NULL = Nothing in the Maybe Double
-type ColValue a = Either [String] [Maybe a]
+type ColType a = Either [String] [Maybe a]
 
 -- Functor won't work because ColValue is not *->*
-colMap :: (forall a. [a]->[a]) -> ColValue a -> ColValue a
+colMap :: (forall a. [a]->[a]) -> ColType b -> ColType b
 colMap f (Left ss) =  Left $ f ss
 colMap f (Right ns) =  Right $ f ns
 
 -- Shows that it might be better to make ColValue a functor!!!
-instance Show a => Monoid (ColValue a) where
+instance Show a => Monoid (ColType a) where
     mappend l1 l2 = case (l1, l2) of
                     (Right ln1, Right ln2) -> Right (ln1 ++ ln2)
                     (Left ls1, Left ls2) -> Left (ls1 ++ ls2)
@@ -46,14 +50,18 @@ instance Show a => Monoid (ColValue a) where
     mempty = Right []
 
 
-tailColV::ColValue a->ColValue a
+tailColV::ColType a->ColType a
 tailColV = colMap tail
 
 mshow::Show a => Maybe a -> String
 mshow (Just v) = show v
 mshow Nothing = ""
 
-cvShow :: Show a => ColValue a -> String
+eshow::(ToString a, ToString b) => Either a b -> String
+eshow (Left x) = toString x
+eshow (Right y) = toString y
+
+cvShow :: Show a => ColType a -> String
 cvShow (Right ln) = concatMap (\md-> "<number>" ++ mshow md ++ "</number>" ) ln
 cvShow (Left ls) = concatMap (\ms-> "<string>" ++ ms ++ "</string>" ) ls
 
@@ -61,27 +69,21 @@ type Csv a = [[Value a]]
 type Db a = [Row a]
 type Row a = [Cell a]
 type Cell a = (String, Value a) -- key, value
-type Col a = (String, ColValue a) -- ie. all the same field - we need to make them all doubles or all strings...
+type Col a = (String, ColType a) -- ie. all the same field - we need to make them all doubles or all strings...
 type Tdb a = [Col a]
 
--- Writes a Db as a html table
---instance Show Db where
---    show [] = "<table></table>"
---    show db = "<table>" ++ (write_header (head db)) ++ (concatMap rshow db) ++ "</table>"
-
-dshow:: (Show a, RealFrac a) => Db a -> String
+dshow:: (ToString a, RealFrac a) => Db a -> String
 dshow [] = "<table></table>"
 dshow db = "<table>" ++ writeHeader (head db) ++ concatMap rshow db ++ "</table>"
-
-rshow :: (Show a, RealFrac a) => Row a -> String
-rshow r = "<tr>" ++ concatMap (\f -> "<td>" ++ eshow (snd f) ++ "</td>") r ++ "</tr>"
-
 
 -------------------------------------------------------------------------
 -- Writes a header from the strings of each field
 -------------------------------------------------------------------------
 writeHeader::Row a -> String
 writeHeader r = "<tr>" ++ concatMap (\f ->"<th>" ++ fst f ++ "</th>") r ++ "</tr>"
+
+rshow :: (ToString a, RealFrac a) => Row a -> String
+rshow r = "<tr>" ++ concatMap (\f -> "<td>" ++ eshow (snd f) ++ "</td>") r ++ "</tr>"
 
 tailCol::Col a -> Col a
 tailCol c = (fst c, tailColV $ snd c)
@@ -187,7 +189,7 @@ select (CellIndex n) r | n > 0 && n <= length r = Just (snd (r !! (n - 1)))
                         | otherwise             = Nothing
 
 -- Selects a column from a daatabase
-dselect :: (Eq a) => Selector -> Tdb a -> Maybe (ColValue a)
+dselect :: (Eq a) => Selector -> Tdb a -> Maybe (ColType a)
 dselect (CellName s) tdb                              = lookup s tdb
 dselect (CellIndex n) tdb | n > 0 && n <= length tdb  = Just (snd (tdb !! (n - 1)))
                             | otherwise               = Nothing
@@ -205,7 +207,7 @@ sortdb :: (Ord a, Read a) => Selector -> Db a -> Db a
 sortdb s = sortBy (\a b -> compare (select s b) (select s a))
 
 -- folds a function over a LValue only if it is a Maybe Double list
-mfoldl::(b -> a -> b) -> b -> ColValue a -> b
+mfoldl::(b -> a -> b) -> b -> ColType a -> b
 mfoldl f acc (Right ns) = foldl (\a x -> case x of
                                         Just n -> f a n
                                         Nothing -> a
